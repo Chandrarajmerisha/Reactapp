@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,29 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+
+
+.App {
+  text-align: center;
+}
+
+.App-nav {
+  background-color: #282c34;
+  padding: 1rem;
+}
+
+.App-link {
+  color: #61dafb;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.App-link:hover {
+  color: #21a1f1;
+}
+
+main {
+  min-height: 100vh;
 }
