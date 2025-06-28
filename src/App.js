@@ -1,148 +1,105 @@
-// import logo from './logo.svg';
-// import { Routes, Route,} from "react-router-dom";
-// import './App.css';
-// import './Home.css';
-// import Home from "./Home.js";
+import Navbar from './components/Navbar';
+import './App.css';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Auth from './components/Auth';
+import ImageUpload from './components/ImageUpload';
+import UserProfile from './components/UserProfile';
+import About from './components/About';
+import Contact from './components/Contact';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import EditProfile from './components/EditProfile';
+import ChangePassword from './components/ChangePassword';
+import AccountSettings from './components/AccountSettings';
+import OAuthSuccess from './components/OAuthSuccess';
 
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <h1> Hello </h1>
-//         <p>
-//          Hello this is a simple React application with routing.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//       {/* Pages */}
-//       <Routes>
-//         <Route path="/" element={<Home/>} />
-//         </Routes>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-// import React, { useState, useEffect } from "react";
-// import { Routes, Route, Link, useLocation } from "react-router-dom";
-// import Home from "./Home";
-// import About from "./About";
-// import Services from "./Service";
-// import Blogs from "./Blogs";
-// import Contact from "./Contact";
-// import Footer from "./Footer";
-
-// function App() {
-//   const [menuOpen, setMenuOpen] = useState(false);
-//   const location = useLocation();
-
-//   // Close menu and scroll to top on route change
-//   useEffect(() => {
-//     setMenuOpen(false);
-//     window.scrollTo(0, 0);
-//   }, [location.pathname]);
-
-//   return (
-//     <div className="landing">
-//       {/* Navbar */}
-//       <nav className="navbar">
-//         <div className="navbar-container">
-//           {/* Logo */}
-//           <div className="logo">
-//             <Link to="/">
-//               <img src="/Images/fevi12.jpg" alt="Logo" style={{ height: "50px" }} />
-//             </Link>
-//           </div>
-
-//           {/* Mobile menu toggle */}
-//           <div className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
-//             {menuOpen ? "✖" : "☰"}
-//           </div>
-
-//           {/* Navigation links */}
-//           <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
-//             <li>
-//               <Link to="/" className={location.pathname === "/" ? "active" : ""}>
-//                 Home
-//               </Link>
-//             </li>
-//             <li>
-//               <Link to="/about" className={location.pathname === "/about" ? "active" : ""}>
-//                 About Us
-//               </Link>
-//             </li>
-//             <li>
-//               <Link to="/services" className={location.pathname === "/services" ? "active" : ""}>
-//                 Services
-//               </Link>
-//             </li>
-//             <li>
-//               <Link to="/blogs" className={location.pathname === "/blogs" ? "active" : ""}>
-//                 Blogs
-//               </Link>
-//             </li>
-//             <li>
-//               <Link to="/contact" className={location.pathname === "/contact" ? "active" : ""}>
-//                 Contact Us
-//               </Link>
-//             </li>
-//           </ul>
-//         </div>
-//       </nav>
-
-//       {/* Pages */}
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/about" element={<About />} />
-//         <Route path="/services" element={<Services />} />
-//         <Route path="/blogs" element={<Blogs />} />
-//         <Route path="/contact" element={<Contact />} />
-//       </Routes>
-
-//       {/* Footer */}
-//       <Footer />
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './Home';
-import About from './About';
-import Contact from './Contact';
-import Privacy from './Privacy';
+import { useState, useEffect } from 'react';
 
 function App() {
+  const navigate = useNavigate();
+  const [flash, setFlash] = useState("");
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('hasVisited')) {
+      setShowOnboarding(true);
+      localStorage.setItem('hasVisited', 'true');
+    }
+  }, []);
+
+  const handleImageUploadClick = () => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLoggedIn) {
+      navigate('/auth'); // Route to login/signup if not logged in
+      setFlash("Login to start");
+      setTimeout(() => setFlash(""), 2500);
+    } else {
+      navigate('/image-upload');
+    }
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/privacy" element={<Privacy />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="app-container">
+      <Navbar setFlash={setFlash} />
+      {showOnboarding && (
+        <div className="onboarding-modal">
+          <div className="onboarding-content">
+            <h2>👋 Welcome to PsoriasisAI!</h2>
+            <p>We're here to help you analyze psoriasis images with AI-powered segmentation.<br /><br />
+              <b>How to get started:</b>
+              <ul>
+                <li>Sign up or log in to your account.</li>
+                <li>Click <b>Start</b> to upload an image.</li>
+                <li>View your segmentation results and metrics instantly.</li>
+                <li>Explore About, Contact, and Privacy Policy for more info.</li>
+              </ul>
+            </p>
+            <button className="cta-btn" onClick={() => setShowOnboarding(false)} style={{marginTop:'1.5rem'}}>Get Started</button>
+          </div>
+        </div>
+      )}
+      <main className="main-content">
+        {flash && (
+          <div className={
+            `flash-message${flash.toLowerCase().includes('success') || flash.startsWith('✅') ? ' success' : ''}`
+          }>
+            <span>{flash}</span>
+            <button className="flash-close" onClick={() => setFlash("")} aria-label="Close">&times;</button>
+          </div>
+        )}
+        <Routes>
+          <Route path="/" element={
+            <section className="hero-section">
+              <div className="hero-medical-icon">
+                <svg width="64" height="64" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="64" height="64" rx="16" fill="#eaf6fb"/>
+                  <path d="M32 18v28M18 32h28" stroke="#21a1f3" strokeWidth="4" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h1>Welcome to PsoriasisAI</h1>
+              <div className="hero-badge">AI-powered • Privacy-focused • Trusted</div>
+              <p className="hero-tagline">Your reliable assistant for accurate, secure, and fast psoriasis lesion analysis.</p>
+              <p>Your smart assistant for psoriasis detection and information.</p>
+              <button className="cta-btn" onClick={handleImageUploadClick}>Start Segmentation</button>
+            </section>
+          } />
+          <Route path="/auth" element={<Auth setFlash={setFlash} />} />
+          <Route path="/image-upload" element={<ImageUpload />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
+        </Routes>
+      </main>
+      <footer className="footer">
+        <p>&copy; {new Date().getFullYear()} PsoriasisAI. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }
 
 export default App;
-git init
-git add .
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/Chandrarajmerisha/Psoriasis-APP.git
-git push -u origin main
+
