@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-x2dj.onrender.com';
+
 export default function OAuthSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,7 +14,7 @@ export default function OAuthSuccess() {
       localStorage.setItem('jwt', token);
       localStorage.setItem('isLoggedIn', 'true');
       // Fetch user info from backend using the token
-      fetch('http://localhost:5000/api/me', {
+      fetch(`${API_BASE_URL}/api/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())

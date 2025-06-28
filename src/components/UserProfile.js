@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-x2dj.onrender.com';
+
 export default function UserProfile() {
   const [user, setUser] = useState({
     name: localStorage.getItem('userName') || '',
@@ -8,13 +10,14 @@ export default function UserProfile() {
     avatar: localStorage.getItem('userAvatar') || '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Always try to fetch user info from backend on mount
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
-      fetch('http://localhost:5000/api/me', {
+      fetch(`${API_BASE_URL}/api/me`, {
         headers: { 'Authorization': `Bearer ${jwt}` },
       })
         .then(res => {
@@ -31,13 +34,19 @@ export default function UserProfile() {
             localStorage.setItem('userName', data.name || '');
             localStorage.setItem('userEmail', data.email);
             localStorage.setItem('userAvatar', data.avatar || '');
+            setError('');
           } else {
             setError('User info not available.');
           }
+          setLoading(false);
         })
-        .catch(() => setError('Could not load user info. Please log in again.'));
+        .catch(() => {
+          setError('Could not load user info. Please log in again.');
+          setLoading(false);
+        });
     } else {
       setError('No authentication token found. Please log in.');
+      setLoading(false);
     }
   }, []); // Only on mount
 
@@ -46,7 +55,7 @@ export default function UserProfile() {
     // Optionally call backend logout
     if (jwt) {
       try {
-        await fetch('http://localhost:5000/api/auth/logout', {
+        await fetch(`${API_BASE_URL}/api/auth/logout`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${jwt}` },
         });
@@ -71,7 +80,11 @@ export default function UserProfile() {
         />
       </div>
       <h2>User Profile</h2>
-      {error && <div style={{color:'red',marginBottom:'1rem'}}>{error}</div>}
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div style={{color:'red',marginBottom:'1rem'}}>{error}</div>
+      ) : null}
       <p><strong>Name:</strong> {user.name || 'User'}</p>
       <p><strong>Email:</strong> {user.email || 'Not Available'}</p>
       <button className="cta-btn" onClick={handleLogout}>Logout</button>
