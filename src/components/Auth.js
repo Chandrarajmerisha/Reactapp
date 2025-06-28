@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-x2dj.onrender.com';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -33,7 +34,7 @@ export default function Auth() {
     setMessage('');
     clearUserStorage(); // Clear previous user data before login
     try {
-      const res = await fetch('https://backend-x2dj.onrender.com/api/google-auth', {
+      const res = await fetch(`${API_BASE_URL}/api/google-auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: response.credential }),
@@ -45,7 +46,7 @@ export default function Auth() {
       // Always fetch user info from /api/me if JWT is present
       const jwt = data.token || localStorage.getItem('jwt');
       if (jwt) {
-        const userRes = await fetch('https://backend-x2dj.onrender.com/api/me', {
+        const userRes = await fetch(`${API_BASE_URL}/api/me`, {
           headers: { 'Authorization': `Bearer ${jwt}` },
         });
         if (userRes.ok) {
@@ -105,7 +106,7 @@ export default function Auth() {
     setLoading(true);
     setMessage('');
     clearUserStorage();
-    const url = isLogin ? 'https://backend-x2dj.onrender.com/api/login' : 'https://backend-x2dj.onrender.com/api/signup';
+    const url = isLogin ? `${API_BASE_URL}/api/login` : `${API_BASE_URL}/api/signup`;
     const payload = isLogin
       ? { email: form.email, password: form.password }
       : { name: form.name, email: form.email, password: form.password };
@@ -122,7 +123,7 @@ export default function Auth() {
       localStorage.setItem('isLoggedIn', 'true');
       const jwt = data.token || localStorage.getItem('jwt');
       if (jwt) {
-        const userRes = await fetch('https://backend-x2dj.onrender.com/api/me', {
+        const userRes = await fetch(`${API_BASE_URL}/api/me`, {
           headers: { 'Authorization': `Bearer ${jwt}` },
         });
         if (userRes.ok) {
@@ -160,7 +161,7 @@ export default function Auth() {
               setForgotLoading(true);
               setForgotMsg('');
               try {
-                const res = await fetch('https://backend-x2dj.onrender.com/api/forgot-password', {
+                const res = await fetch(`${API_BASE_URL}/api/forgot-password`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ email: forgotEmail }),
@@ -193,7 +194,7 @@ export default function Auth() {
               setForgotLoading(true);
               setForgotMsg('');
               try {
-                const res = await fetch('https://backend-x2dj.onrender.com/api/verify-otp', {
+                const res = await fetch(`${API_BASE_URL}/api/verify-otp`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ email: forgotEmail, otp: forgotOtp }),
@@ -227,7 +228,7 @@ export default function Auth() {
               setForgotLoading(true);
               setForgotMsg('');
               try {
-                const res = await fetch('https://backend-x2dj.onrender.com/api/reset-password', {
+                const res = await fetch(`${API_BASE_URL}/api/reset-password`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ email: forgotEmail, otp: forgotOtp, newPassword: forgotNewPassword }),
@@ -323,7 +324,7 @@ export default function Auth() {
             <button
               type="button"
               className="google-btn"
-              onClick={() => window.location.href = 'https://backend-x2dj.onrender.com/api/auth/google'}
+              onClick={() => window.location.href = `${API_BASE_URL}/api/auth/google`}
             >
               <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style={{width:22,marginRight:8,verticalAlign:'middle'}} />
               Sign in with Google
